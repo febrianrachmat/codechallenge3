@@ -92,16 +92,11 @@ function App() {
         <button type="button" onClick={addTodo}>Add</button>
       </div>
 
-      {/* Issue 12: Inline styles (inconsistent dengan CSS file) */}
-      <div
-        style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}
-        role="group"
-        aria-label="Filter todos"
-      >
+      <div className="filters" role="group" aria-label="Filter todos">
         <button
           type="button"
           onClick={() => setFilter('all')}
-          style={{ background: filter === 'all' ? '#28a745' : '#007bff' }}
+          className={filter === 'all' ? 'is-active' : undefined}
           aria-pressed={filter === 'all'}
         >
           All
@@ -109,7 +104,7 @@ function App() {
         <button
           type="button"
           onClick={() => setFilter('active')}
-          style={{ background: filter === 'active' ? '#28a745' : '#007bff' }}
+          className={filter === 'active' ? 'is-active' : undefined}
           aria-pressed={filter === 'active'}
         >
           Active
@@ -117,7 +112,7 @@ function App() {
         <button
           type="button"
           onClick={() => setFilter('completed')}
-          style={{ background: filter === 'completed' ? '#28a745' : '#007bff' }}
+          className={filter === 'completed' ? 'is-active' : undefined}
           aria-pressed={filter === 'completed'}
         >
           Completed

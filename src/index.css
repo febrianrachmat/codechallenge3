@@ -68,6 +68,22 @@ button:hover {
   background: #0056b3;
 }
 
+.filters {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.filters button,
+.filters button:hover {
+  background: #007bff;
+}
+
+.filters button.is-active,
+.filters button.is-active:hover {
+  background: #28a745;
+}
+
 .todo-list {
   list-style: none;
 }
