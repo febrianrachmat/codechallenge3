@@ -73,9 +73,12 @@ function App() {
     <div className="app">
       <h1>My Todo List</h1>
       
-      {/* Issue 11: Tidak ada label untuk accessibility */}
       <div className="input-section">
-        <input 
+        <label htmlFor="todo-input" className="visually-hidden">
+          What needs to be done?
+        </label>
+        <input
+          id="todo-input"
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -86,53 +89,69 @@ function App() {
           }}
           placeholder="What needs to be done?"
         />
-        <button onClick={addTodo}>Add</button>
+        <button type="button" onClick={addTodo}>Add</button>
       </div>
-      
+
       {/* Issue 12: Inline styles (inconsistent dengan CSS file) */}
-      <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
-        <button 
+      <div
+        style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}
+        role="group"
+        aria-label="Filter todos"
+      >
+        <button
+          type="button"
           onClick={() => setFilter('all')}
           style={{ background: filter === 'all' ? '#28a745' : '#007bff' }}
+          aria-pressed={filter === 'all'}
         >
           All
         </button>
-        <button 
+        <button
+          type="button"
           onClick={() => setFilter('active')}
           style={{ background: filter === 'active' ? '#28a745' : '#007bff' }}
+          aria-pressed={filter === 'active'}
         >
           Active
         </button>
-        <button 
+        <button
+          type="button"
           onClick={() => setFilter('completed')}
           style={{ background: filter === 'completed' ? '#28a745' : '#007bff' }}
+          aria-pressed={filter === 'completed'}
         >
           Completed
         </button>
       </div>
-      
-      <div className="todo-list">
+
+      <ul className="todo-list">
         {/* Issue 13: Tidak ada handling untuk empty state */}
         {filteredTodos.map((todo) => (
-          // Issue 14: Key menggunakan index bisa lebih baik dengan ID
-          <div key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
-            <input 
+          <li key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+            <input
               type="checkbox"
               checked={todo.completed}
               onChange={() => toggleTodo(todo.id)}
+              aria-label={
+                todo.completed
+                  ? `Mark "${todo.text}" as active`
+                  : `Mark "${todo.text}" as complete`
+              }
             />
             <span>{todo.text}</span>
-            <button 
+            <button
+              type="button"
               className="delete-btn"
               onClick={() => deleteTodo(todo.id)}
+              aria-label={`Delete ${todo.text}`}
             >
               Delete
             </button>
-          </div>
+          </li>
         ))}
-      </div>
-      
-      <div className="stats">
+      </ul>
+
+      <div className="stats" aria-live="polite">
         <p>Total: {stats.total} | Active: {stats.active} | Completed: {stats.completed}</p>
       </div>
     </div>
