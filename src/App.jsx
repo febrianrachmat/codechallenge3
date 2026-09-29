@@ -120,7 +120,9 @@ function App() {
       </div>
 
       <ul className="todo-list">
-        {/* Issue 13: Tidak ada handling untuk empty state */}
+        {filteredTodos.length === 0 && (
+          <li className="empty-state">No todos to show.</li>
+        )}
         {filteredTodos.map((todo) => (
           <li key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
             <input
