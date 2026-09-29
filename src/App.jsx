@@ -1,28 +1,25 @@
 import { useState, useEffect } from 'react'
 
+function loadTodos() {
+  try {
+    const saved = localStorage.getItem('todos')
+    if (!saved) return []
+    const parsed = JSON.parse(saved)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
 function App() {
   // Issue 2: State management bisa lebih baik
-  const [todos, setTodos] = useState([])
+  const [todos, setTodos] = useState(loadTodos)
   const [input, setInput] = useState('')
   const [filter, setFilter] = useState('all')
-  
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('todos')
-      if (!saved) return
-      const parsed = JSON.parse(saved)
-      if (Array.isArray(parsed)) {
-        setTodos(parsed)
-      }
-    } catch {
-      setTodos([])
-    }
-  }, [])
-  
-  // Issue 4: useEffect yang terlalu sering run
+
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos))
-  })
+  }, [todos])
   
   // Issue 5: Function yang tidak di-memoize, re-create setiap render
   const addTodo = () => {
