@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 
 function loadTodos() {
   try {
@@ -12,7 +12,6 @@ function loadTodos() {
 }
 
 function App() {
-  // Issue 2: State management bisa lebih baik
   const [todos, setTodos] = useState(loadTodos)
   const [input, setInput] = useState('')
   const [filter, setFilter] = useState('all')
@@ -20,34 +19,55 @@ function App() {
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos))
   }, [todos])
-  
-  // Issue 5: Function yang tidak di-memoize, re-create setiap render
-  const addTodo = () => {
+
+  const addTodo = useCallback(() => {
     if (input.trim() === '') {
       alert('Please enter a todo')
       return
     }
-    
+
     const newTodo = {
       id: crypto.randomUUID(),
       text: input,
       completed: false,
       createdAt: new Date().toISOString()
     }
-    
+
     setTodos(prev => [...prev, newTodo])
     setInput('')
-  }
+  }, [input])
 
-  const deleteTodo = (id) => {
-    setTodos(prev => prev.filter(todo => todo.id !== id))
-  }
+  const deleteTodo = useCallback((id) => {
+    setTodos(prev => prev.filter(todo => String(todo.id) !== String(id)))
+  }, [])
 
-  const toggleTodo = (id) => {
+  const toggleTodo = useCallback((id) => {
     setTodos(prev => prev.map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      String(todo.id) === String(id) ? { ...todo, completed: !todo.completed } : todo
     ))
-  }
+  }, [])
+
+  const onInputChange = useCallback((event) => {
+    setInput(event.target.value)
+  }, [])
+
+  const onInputKeyDown = useCallback((event) => {
+    if (event.key === 'Enter') {
+      addTodo()
+    }
+  }, [addTodo])
+
+  const onFilter = useCallback((event) => {
+    setFilter(event.currentTarget.value)
+  }, [])
+
+  const onToggle = useCallback((event) => {
+    toggleTodo(event.currentTarget.value)
+  }, [toggleTodo])
+
+  const onDelete = useCallback((event) => {
+    deleteTodo(event.currentTarget.value)
+  }, [deleteTodo])
   
   const filteredTodos = useMemo(() => {
     if (filter === 'active') {
@@ -68,7 +88,6 @@ function App() {
     }
   }, [todos])
   
-  // Issue 10: Inline event handler dengan arrow function (re-create setiap render)
   return (
     <div className="app">
       <h1>My Todo List</h1>
@@ -81,12 +100,8 @@ function App() {
           id="todo-input"
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              addTodo()
-            }
-          }}
+          onChange={onInputChange}
+          onKeyDown={onInputKeyDown}
           placeholder="What needs to be done?"
         />
         <button type="button" onClick={addTodo}>Add</button>
@@ -95,7 +110,8 @@ function App() {
       <div className="filters" role="group" aria-label="Filter todos">
         <button
           type="button"
-          onClick={() => setFilter('all')}
+          value="all"
+          onClick={onFilter}
           className={filter === 'all' ? 'is-active' : undefined}
           aria-pressed={filter === 'all'}
         >
@@ -103,7 +119,8 @@ function App() {
         </button>
         <button
           type="button"
-          onClick={() => setFilter('active')}
+          value="active"
+          onClick={onFilter}
           className={filter === 'active' ? 'is-active' : undefined}
           aria-pressed={filter === 'active'}
         >
@@ -111,7 +128,8 @@ function App() {
         </button>
         <button
           type="button"
-          onClick={() => setFilter('completed')}
+          value="completed"
+          onClick={onFilter}
           className={filter === 'completed' ? 'is-active' : undefined}
           aria-pressed={filter === 'completed'}
         >
@@ -127,8 +145,9 @@ function App() {
           <li key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
             <input
               type="checkbox"
+              value={todo.id}
               checked={todo.completed}
-              onChange={() => toggleTodo(todo.id)}
+              onChange={onToggle}
               aria-label={
                 todo.completed
                   ? `Mark "${todo.text}" as active`
@@ -139,7 +158,8 @@ function App() {
             <button
               type="button"
               className="delete-btn"
-              onClick={() => deleteTodo(todo.id)}
+              value={todo.id}
+              onClick={onDelete}
               aria-label={`Delete ${todo.text}`}
             >
               Delete
