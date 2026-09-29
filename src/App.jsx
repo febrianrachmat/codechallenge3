@@ -36,17 +36,16 @@ function App() {
       createdAt: new Date().toISOString()
     }
     
-    setTodos([...todos, newTodo])
+    setTodos(prev => [...prev, newTodo])
     setInput('')
   }
-  
-  // Issue 7: Tidak ada error handling
+
   const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id))
+    setTodos(prev => prev.filter(todo => todo.id !== id))
   }
-  
+
   const toggleTodo = (id) => {
-    setTodos(todos.map(todo => 
+    setTodos(prev => prev.map(todo =>
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
     ))
   }
